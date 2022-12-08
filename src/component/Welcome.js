@@ -1,3 +1,4 @@
+//Welcome page
 import { Grid, Typography } from "@material-ui/core";
 
 const Welcome = (props) => {

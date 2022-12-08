@@ -1,3 +1,4 @@
+//Logout page
 import { useEffect, useContext } from "react";
 import { Redirect } from "react-router-dom";
 
