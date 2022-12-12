@@ -18,6 +18,9 @@ import {
 } from "@material-ui/core";
 import Rating from "@material-ui/lab/Rating";
 import axios from "axios";
+import BusinessCenterIcon from "@material-ui/icons/BusinessCenter";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import { FiberManualRecord, LocalAtm, Timer } from "@material-ui/icons";
 
 import { SetPopupContext } from "../App";
 
@@ -28,24 +31,34 @@ const useStyles = makeStyles((theme) => ({
     height: "inherit",
   },
   statusBlock: {
-    width: "100%",
-    height: "100%",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    textTransform: "uppercase",
+    alignSelf: "center",
   },
   jobTileOuter: {
     padding: "30px",
     margin: "20px 0",
     boxSizing: "border-box",
+    height: "100%",
     width: "100%",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
   },
   popupDialog: {
     height: "100%",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+  },
+  iconLabel: {
+    display: "flex",
+    alignItems: "center",
+  },
+  greyIcon: {
+    color: "#595959",
+    marginRight: 5,
+  },
+  button: {
+    alignSelf: "center",
   },
 }));
 
@@ -132,62 +145,96 @@ const ApplicationTile = (props) => {
   return (
     <Paper className={classes.jobTileOuter} elevation={3}>
       <Grid container>
-        <Grid container item xs={9} spacing={1} direction="column">
+        <Grid container spacing={1} direction="column">
           <Grid item>
-            <Typography variant="h5">{application.job.title}</Typography>
+            <Typography variant="h5" style={{ fontWeight: "bold" }}>
+              {application.job.title}
+            </Typography>
+            <Typography
+              variant="body1"
+              style={{ fontWeight: "bold" }}
+              color="textSecondary"
+            >
+              {application.job.recruiter
+                ? application.job.recruiter.name
+                : "Anonymous"}
+            </Typography>
           </Grid>
           <Grid item>
-            Posted By: {application.recruiter?.name || "Anonymous"}
+            <div>
+              <div className={classes.iconLabel}>
+                <BusinessCenterIcon className={classes.greyIcon} />
+                {application.job.jobType}
+              </div>
+            </div>
+            <div>
+              <div className={classes.iconLabel}>
+                <LocalAtm className={classes.greyIcon} />$
+                {application.job.salary} per month
+              </div>
+            </div>
+            <div>
+              <div className={classes.iconLabel}>
+                <Timer className={classes.greyIcon} />
+                {application.job.duration !== 0
+                  ? `${application.job.duration} month`
+                  : `Flexible`}
+              </div>
+            </div>
           </Grid>
-          <Grid item>Role : {application.job.jobType}</Grid>
-          <Grid item>Salary : &#8377; {application.job.salary} per month</Grid>
-          <Grid item>
-            Duration :{" "}
-            {application.job.duration !== 0
-              ? `${application.job.duration} month`
-              : `Flexible`}
-          </Grid>
-          <Grid item>
+          <Grid item style={{ marginTop: 10 }}>
             {application.job.skillsets.map((skill) => (
               <Chip label={skill} style={{ marginRight: "2px" }} />
             ))}
           </Grid>
-          <Grid item>Applied On: {appliedOn.toLocaleDateString()}</Grid>
-          {application.status === "accepted" ||
-          application.status === "finished" ? (
-            <Grid item>Joined On: {joinedOn.toLocaleDateString()}</Grid>
-          ) : null}
-        </Grid>
-        <Grid item container direction="column" xs={3}>
-          <Grid item xs>
-            <Paper
+          <Grid item>
+            <div>
+              <div className={classes.iconLabel}>
+                <FiberManualRecord className={classes.greyIcon} /> Applied On{" "}
+                {appliedOn.toLocaleDateString()}
+              </div>
+            </div>
+            {application.status === "accepted" ||
+            application.status === "finished" ? (
+              <div>
+                <div className={classes.iconLabel}>
+                  <FiberManualRecord className={classes.greyIcon} /> Joined On{" "}
+                  {joinedOn.toLocaleDateString()}
+                </div>
+              </div>
+            ) : null}
+            <div
               className={classes.statusBlock}
               style={{
-                background: colorSet[application.status],
-                color: "#ffffff",
+                color: colorSet[application.status],
+                display: "flex",
+                alignItems: "center",
               }}
             >
-              {application.status}
-            </Paper>
+              {" "}
+              <FiberManualRecord
+                style={{ color: colorSet[application.status], marginRight: 5 }}
+              />
+              {application.status.charAt(0).toUpperCase() +
+                application.status.slice(1)}
+            </div>
           </Grid>
-          {application.status === "accepted" ||
-          application.status === "finished" ? (
-            <Grid item>
-              <Button
-                variant="contained"
-                color="primary"
-                className={classes.statusBlock}
-                onClick={() => {
-                  fetchRating();
-                  setOpen(true);
-                }}
-              >
-                Rate Job
-              </Button>
-            </Grid>
-          ) : null}
         </Grid>
       </Grid>
+      {application.status === "accepted" ||
+      application.status === "finished" ? (
+        <Button
+          variant="contained"
+          color="primary"
+          className={classes.button}
+          onClick={() => {
+            fetchRating();
+            setOpen(true);
+          }}
+        >
+          Rate Job
+        </Button>
+      ) : null}
       <Modal open={open} onClose={handleClose} className={classes.popupDialog}>
         <Paper
           style={{
@@ -260,26 +307,24 @@ const Applications = (props) => {
       alignItems="center"
       style={{ padding: "30px", minHeight: "93vh" }}
     >
-      <Grid item>
-        <Typography variant="h2">Applications</Typography>
+      <Grid item style={{ width: "100%" }}>
+        <Typography variant="h4" align="left" style={{ fontWeight: "bold" }}>
+          Applications
+        </Typography>
       </Grid>
-      <Grid
-        container
-        item
-        xs
-        direction="column"
-        style={{ width: "100%" }}
-        alignItems="stretch"
-        justify="center"
-      >
+      <Grid container spacing={3}>
         {applications.length > 0 ? (
           applications.map((obj) => (
-            <Grid key={obj._id} item>
+            <Grid key={obj._id} item xs={12} sm={6} md={4}>
               <ApplicationTile application={obj} />
             </Grid>
           ))
         ) : (
-          <Typography variant="h5" style={{ textAlign: "center" }}>
+          <Typography
+            variant="h5"
+            color="textSecondary"
+            style={{ width: "100%", textAlign: "center", marginTop: 200 }}
+          >
             No Applications Found
           </Typography>
         )}

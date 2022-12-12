@@ -27,24 +27,31 @@ import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
 import { SetPopupContext } from "../../App";
 
 import apiList, { server } from "../../lib/apiList";
+import BusinessCenterIcon from "@material-ui/icons/BusinessCenter";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import {
+  FiberManualRecord,
+  LocalAtm,
+  Timer,
+  CalendarToday,
+} from "@material-ui/icons";
 
 const useStyles = makeStyles((theme) => ({
   body: {
     height: "inherit",
   },
   statusBlock: {
-    width: "100%",
-    height: "100%",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    textTransform: "uppercase",
+    alignSelf: "center",
   },
   jobTileOuter: {
     padding: "30px",
     margin: "20px 0",
     boxSizing: "border-box",
+    height: "100%",
     width: "100%",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
   },
   popupDialog: {
     height: "100%",
@@ -55,6 +62,22 @@ const useStyles = makeStyles((theme) => ({
   avatar: {
     width: theme.spacing(17),
     height: theme.spacing(17),
+  },
+  iconLabel: {
+    display: "flex",
+    alignItems: "center",
+  },
+  greyIcon: {
+    color: "#595959",
+    marginRight: 5,
+  },
+  button: {
+    alignSelf: "center",
+    width: "100%",
+  },
+  buttongrp: {
+    display: "flex",
+    width: "100%",
   },
 }));
 
@@ -524,10 +547,10 @@ const ApplicationTile = (props) => {
 
   return (
     <Paper className={classes.jobTileOuter} elevation={3}>
-      <Grid container>
+      <Grid container spacing={1}>
         <Grid
           item
-          xs={2}
+          xs={12}
           style={{
             display: "flex",
             justifyContent: "center",
@@ -539,53 +562,88 @@ const ApplicationTile = (props) => {
             className={classes.avatar}
           />
         </Grid>
-        <Grid container item xs={7} spacing={1} direction="column">
-          <Grid item>
-            <Typography variant="h5">
-              {application.jobApplicant.name}
-            </Typography>
-          </Grid>
-          <Grid item>
-            <Rating
-              value={
-                application.jobApplicant.rating !== -1
-                  ? application.jobApplicant.rating
-                  : null
-              }
-              readOnly
+        <Grid item>
+          <Typography variant="h5" style={{ fontWeight: "bold" }}>
+            {application.jobApplicant.name}
+          </Typography>
+          <Typography
+            color="textSecondary"
+            variant="h6"
+            style={{ fontWeight: "bold" }}
+          >
+            {application.job.title}
+          </Typography>
+          <div>
+            <div className={classes.iconLabel}>
+              <BusinessCenterIcon className={classes.greyIcon} />
+              {application.job.jobType}
+            </div>
+          </div>
+          <Rating
+            value={
+              application.jobApplicant.rating !== -1
+                ? application.jobApplicant.rating
+                : null
+            }
+            readOnly
+          />
+          <div>
+            <div className={classes.iconLabel}>
+              <CalendarToday className={classes.greyIcon} /> Applied On{" "}
+              {appliedOn.toLocaleDateString()}
+            </div>
+          </div>
+          <div
+            className={classes.statusBlock}
+            style={{
+              color: colorSet[application.status],
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            {" "}
+            <FiberManualRecord
+              style={{ color: colorSet[application.status], marginRight: 5 }}
             />
-          </Grid>
-          <Grid item>Job Title: {application.job.title}</Grid>
-          <Grid item>Role: {application.job.jobType}</Grid>
-          <Grid item>Applied On: {appliedOn.toLocaleDateString()}</Grid>
-          <Grid item>
-            SOP: {application.sop !== "" ? application.sop : "Not Submitted"}
-          </Grid>
-          <Grid item>
+            {application.status.charAt(0).toUpperCase() +
+              application.status.slice(1)}
+          </div>
+          <Grid item style={{ marginTop: 10 }}>
             {application.jobApplicant.skills.map((skill) => (
               <Chip label={skill} style={{ marginRight: "2px" }} />
             ))}
           </Grid>
         </Grid>
-        <Grid item container direction="column" xs={3}>
-          <Grid item>
+        <Grid item xs={12} style={{ width: "100%" }}>
+          <div style={{ width: "100%" }}>
+            <div style={{ display: "flex" }}>
+              <Button
+                variant="contained"
+                className={classes.button}
+                color="primary"
+                onClick={() => getResume()}
+                style={{ marginRight: 5 }}
+              >
+                Download Resume
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                className={classes.button}
+                onClick={() => {
+                  setOpen(true);
+                }}
+              >
+                Rate Applicant
+              </Button>
+            </div>
             <Button
               variant="contained"
-              className={classes.statusBlock}
               color="primary"
-              onClick={() => getResume()}
-            >
-              Download Resume
-            </Button>
-          </Grid>
-          <Grid item container xs>
-            {/* {buttonSet[application.status]} */}
-            <Button
-              variant="contained"
-              color="primary"
-              className={classes.statusBlock}
+              className={classes.button}
               style={{
                 background: "#09BC8A",
+                marginTop: 5,
               }}
               onClick={() => {
                 setOpenEndJob(true);
@@ -593,19 +651,7 @@ const ApplicationTile = (props) => {
             >
               End Job
             </Button>
-          </Grid>
-          <Grid item>
-            <Button
-              variant="contained"
-              color="primary"
-              className={classes.statusBlock}
-              onClick={() => {
-                setOpen(true);
-              }}
-            >
-              Rate Applicant
-            </Button>
-          </Grid>
+          </div>
         </Grid>
       </Grid>
       <Modal open={open} onClose={handleClose} className={classes.popupDialog}>
@@ -783,18 +829,10 @@ const AcceptedApplicants = (props) => {
             <FilterListIcon />
           </IconButton>
         </Grid>
-        <Grid
-          container
-          item
-          xs
-          direction="column"
-          style={{ width: "100%" }}
-          alignItems="stretch"
-          justify="center"
-        >
+        <Grid container spacing={3}>
           {applications.length > 0 ? (
             applications.map((obj) => (
-              <Grid key={obj._id} item>
+              <Grid key={obj._id} item xs={12} sm={6} md={4}>
                 {/* {console.log(obj)} */}
                 <ApplicationTile application={obj} getData={getData} />
               </Grid>

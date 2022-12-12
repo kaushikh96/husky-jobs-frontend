@@ -24,6 +24,16 @@ import SearchIcon from "@material-ui/icons/Search";
 import FilterListIcon from "@material-ui/icons/FilterList";
 import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
 import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
+import BusinessCenterIcon from "@material-ui/icons/BusinessCenter";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import {
+  CalendarToday,
+  FiberManualRecord,
+  LocalAtm,
+  Person,
+  PersonAdd,
+  Timer,
+} from "@material-ui/icons";
 
 import { SetPopupContext } from "../../App";
 
@@ -42,6 +52,10 @@ const useStyles = makeStyles((theme) => ({
     margin: "20px 0",
     boxSizing: "border-box",
     width: "100%",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
+    height: "100%",
   },
   popupDialog: {
     height: "100%",
@@ -56,6 +70,24 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     textTransform: "uppercase",
+  },
+  homeTitle: {
+    marginTop: 20,
+    fontWeight: "bold",
+    color: "#050C26",
+  },
+  searchDiv: {
+    backgroundColor: "white",
+    padding: 20,
+    display: "flex",
+  },
+  iconLabel: {
+    display: "flex",
+    alignItems: "center",
+  },
+  greyIcon: {
+    color: "#595959",
+    marginRight: 5,
   },
 }));
 
@@ -150,43 +182,79 @@ const JobTile = (props) => {
   return (
     <Paper className={classes.jobTileOuter} elevation={3}>
       <Grid container>
-        <Grid container item xs={9} spacing={1} direction="column">
+        <Grid container item spacing={1} direction="column">
           <Grid item>
-            <Typography variant="h5">{job.title}</Typography>
+            <Typography variant="h5" style={{ fontWeight: "bold" }}>
+              {job.title}
+            </Typography>
           </Grid>
           <Grid item>
             <Rating value={job.rating !== -1 ? job.rating : null} readOnly />
           </Grid>
-          <Grid item>Role : {job.jobType}</Grid>
-          <Grid item>Salary : &#8377; {job.salary} per month</Grid>
           <Grid item>
-            Duration :{" "}
-            {job.duration !== 0 ? `${job.duration} month` : `Flexible`}
-          </Grid>
-          <Grid item>Date Of Posting: {postedOn.toLocaleDateString()}</Grid>
-          <Grid item>Number of Applicants: {job.maxApplicants}</Grid>
-          <Grid item>
-            Remaining Number of Positions:{" "}
-            {job.maxPositions - job.acceptedCandidates}
-          </Grid>
-          <Grid item>
-            {job.skillsets.map((skill, index) => (
-              <Chip key={index} label={skill} style={{ marginRight: "2px" }} />
-            ))}
+            <div>
+              <div className={classes.iconLabel}>
+                <BusinessCenterIcon className={classes.greyIcon} />
+                {job.jobType}
+              </div>
+            </div>
+            <div>
+              <div className={classes.iconLabel}>
+                <LocalAtm className={classes.greyIcon} />${job.salary} per month
+              </div>
+            </div>
+            <div>
+              <div className={classes.iconLabel}>
+                <Timer className={classes.greyIcon} />
+                {job.duration !== 0 ? `${job.duration} month` : `Flexible`}
+              </div>
+            </div>
+            <div>
+              <div className={classes.iconLabel}>
+                <CalendarToday className={classes.greyIcon} /> Date Of Posting{" "}
+                {postedOn.toLocaleDateString()}
+              </div>
+            </div>
+            <div>
+              <div className={classes.iconLabel}>
+                <Person className={classes.greyIcon} />
+                {job.maxApplicants} Applicants
+              </div>
+            </div>
+            <div>
+              <div className={classes.iconLabel}>
+                <PersonAdd className={classes.greyIcon} />
+                {job.maxPositions - job.acceptedCandidates} positions remaining
+              </div>
+            </div>
+            <Grid item style={{ marginTop: 10 }}>
+              {job.skillsets.map((skill, index) => (
+                <Chip
+                  key={index}
+                  label={skill}
+                  style={{ marginRight: "2px" }}
+                />
+              ))}
+            </Grid>
           </Grid>
         </Grid>
-        <Grid item container direction="column" xs={3}>
-          <Grid item xs>
-            <Button
-              variant="contained"
-              color="primary"
-              className={classes.statusBlock}
-              onClick={() => handleClick(`/job/applications/${job._id}`)}
-            >
-              View Applications
-            </Button>
-          </Grid>
-          <Grid item>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            marginTop: 10,
+            width: "100%",
+          }}
+        >
+          <Button
+            variant="contained"
+            color="primary"
+            className={classes.statusBlock}
+            onClick={() => handleClick(`/job/applications/${job._id}`)}
+          >
+            View Applications
+          </Button>
+          <div style={{ display: "flex", alignItems: "center", marginTop: 10 }}>
             <Button
               variant="contained"
               className={classes.statusBlock}
@@ -196,12 +264,11 @@ const JobTile = (props) => {
               style={{
                 background: "#FC7A1E",
                 color: "#fff",
+                marginRight: 5,
               }}
             >
               Update Details
             </Button>
-          </Grid>
-          <Grid item>
             <Button
               variant="contained"
               color="secondary"
@@ -212,8 +279,8 @@ const JobTile = (props) => {
             >
               Delete Job
             </Button>
-          </Grid>
-        </Grid>
+          </div>
+        </div>
       </Grid>
       <Modal open={open} onClose={handleClose} className={classes.popupDialog}>
         <Paper
@@ -318,6 +385,19 @@ const JobTile = (props) => {
                 }}
                 InputProps={{ inputProps: { min: 1 } }}
                 fullWidth
+              />
+            </Grid>
+            <Grid item>
+              <TextField
+                label="Description"
+                variant="outlined"
+                value={jobDetails.description}
+                onChange={(event) => {
+                  handleInput("description", event.target.value);
+                }}
+                fullWidth
+                multiline
+                minRows={5}
               />
             </Grid>
           </Grid>
@@ -683,6 +763,7 @@ const FilterPopup = (props) => {
 const MyJobs = (props) => {
   const [jobs, setJobs] = useState([]);
   const [filterOpen, setFilterOpen] = useState(false);
+  const classes = useStyles();
   const [searchOptions, setSearchOptions] = useState({
     query: "",
     jobType: {
@@ -794,62 +875,57 @@ const MyJobs = (props) => {
         alignItems="center"
         style={{ padding: "30px", minHeight: "93vh" }}
       >
-        <Grid
-          item
-          container
-          direction="column"
-          justify="center"
-          alignItems="center"
-        >
-          <Grid item xs>
-            <Typography variant="h2">My Jobs</Typography>
-          </Grid>
-          <Grid item xs>
-            <TextField
-              label="Search Jobs"
-              value={searchOptions.query}
-              onChange={(event) =>
-                setSearchOptions({
-                  ...searchOptions,
-                  query: event.target.value,
-                })
-              }
-              onKeyPress={(ev) => {
-                if (ev.key === "Enter") {
-                  getData();
+        <Grid item style={{ width: "100%" }}>
+          <Typography
+            variant="h5"
+            align="left"
+            style={{ fontWeight: "bold", marginBottom: 10 }}
+          >
+            My Jobs
+          </Typography>
+          <Grid item style={{ width: "100%" }}>
+            <div className={classes.searchDiv}>
+              <TextField
+                label="Search Jobs"
+                value={searchOptions.query}
+                onChange={(event) =>
+                  setSearchOptions({
+                    ...searchOptions,
+                    query: event.target.value,
+                  })
                 }
-              }}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment>
-                    <IconButton onClick={() => getData()}>
-                      <SearchIcon />
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-              style={{ width: "500px" }}
-              variant="outlined"
-            />
-          </Grid>
-          <Grid item>
-            <IconButton onClick={() => setFilterOpen(true)}>
-              <FilterListIcon />
-            </IconButton>
+                onKeyPress={(ev) => {
+                  if (ev.key === "Enter") {
+                    getData();
+                  }
+                }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment>
+                      <IconButton onClick={() => getData()}>
+                        <SearchIcon />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+                style={{ width: "100%" }}
+                variant="outlined"
+              />
+              <IconButton onClick={() => setFilterOpen(true)}>
+                <FilterListIcon />
+              </IconButton>
+            </div>
           </Grid>
         </Grid>
 
-        <Grid
-          container
-          item
-          xs
-          direction="column"
-          alignItems="stretch"
-          justify="center"
-        >
+        <Grid container spacing={3}>
           {jobs.length > 0 ? (
             jobs.map((job) => {
-              return <JobTile key={job._id} job={job} getData={getData} />;
+              return (
+                <Grid item xs={12} sm={6} md={4}>
+                  <JobTile key={job._id} job={job} getData={getData} />
+                </Grid>
+              );
             })
           ) : (
             <Typography variant="h5" style={{ textAlign: "center" }}>

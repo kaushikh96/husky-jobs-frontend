@@ -55,7 +55,7 @@ function App() {
                 <Home />
               </Route>
               <Route exact path="/search/:keyword">
-                <Home />
+                <Home search={true} />
               </Route>
               <Route exact path="/login">
                 <Login />

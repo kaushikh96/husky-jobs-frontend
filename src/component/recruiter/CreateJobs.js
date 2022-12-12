@@ -44,6 +44,7 @@ const CreateJobs = (props) => {
     jobType: "Full Time",
     duration: 0,
     salary: 0,
+    description: "",
   });
 
   const handleInput = (key, value) => {
@@ -71,6 +72,7 @@ const CreateJobs = (props) => {
           title: "",
           maxApplicants: 100,
           maxPositions: 30,
+          description: "",
           deadline: new Date(new Date().getTime() + 10 * 24 * 60 * 60 * 1000)
             .toISOString()
             .substr(0, 16),
@@ -202,6 +204,19 @@ const CreateJobs = (props) => {
                     }}
                     InputProps={{ inputProps: { min: 0 } }}
                     fullWidth
+                  />
+                </Grid>
+                <Grid item>
+                  <TextField
+                    label="Description"
+                    value={jobDetails.description}
+                    onChange={(event) =>
+                      handleInput("description", event.target.value)
+                    }
+                    variant="outlined"
+                    fullWidth
+                    multiline
+                    minRows={5}
                   />
                 </Grid>
                 <Grid item>

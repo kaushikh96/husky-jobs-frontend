@@ -24,27 +24,32 @@ import FilterListIcon from "@material-ui/icons/FilterList";
 import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
 import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
 import { useHistory, useParams } from "react-router-dom";
-import isAuth from "../lib/isAuth";
-
+import isAuth, { userName } from "../lib/isAuth";
+import BusinessCenterIcon from "@material-ui/icons/BusinessCenter";
+import CircularProgress from "@material-ui/core/CircularProgress";
 import { SetPopupContext } from "../App";
 
 import apiList from "../lib/apiList";
 import { userType } from "../lib/isAuth";
 import Search from "@material-ui/icons/Search";
+import { FiberManualRecord, LocalAtm, Timer } from "@material-ui/icons";
 
 const useStyles = makeStyles((theme) => ({
   body: {
     height: "inherit",
   },
   button: {
-    width: "100%",
-    height: "100%",
+    alignSelf: "center",
   },
   jobTileOuter: {
     padding: "30px",
     margin: "20px 0",
     boxSizing: "border-box",
+    height: "100%",
     width: "100%",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
     "&:hover": {
       border: "2px solid",
       cursor: "pointer",
@@ -53,14 +58,36 @@ const useStyles = makeStyles((theme) => ({
   jobTileOuterAdmin: {
     padding: "30px",
     margin: "20px 0",
+    height: "100%",
     boxSizing: "border-box",
     width: "100%",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
   },
   popupDialog: {
     height: "100%",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+  },
+  homeTitle: {
+    marginTop: 20,
+    fontWeight: "bold",
+    color: "#050C26",
+  },
+  searchDiv: {
+    backgroundColor: "white",
+    padding: 20,
+    display: "flex",
+  },
+  iconLabel: {
+    display: "flex",
+    alignItems: "center",
+  },
+  greyIcon: {
+    color: "#595959",
+    marginRight: 5,
   },
 }));
 
@@ -127,49 +154,70 @@ const JobTile = (props) => {
       onClick={() => handleJobClick(job)}
     >
       <Grid container>
-        <Grid container item xs={9} spacing={1} direction="column">
+        <Grid container item spacing={1} direction="column">
           <Grid item>
-            <Typography variant="h5">{job.title}</Typography>
+            <Typography variant="h5" style={{ fontWeight: "bold" }}>
+              {job.title}
+            </Typography>
+            <Typography
+              variant="body1"
+              style={{ fontWeight: "bold" }}
+              color="textSecondary"
+            >
+              {job.recruiter ? job.recruiter.name : "Anonymous"}
+            </Typography>
           </Grid>
           <Grid item>
             <Rating value={job.rating !== -1 ? job.rating : null} readOnly />
           </Grid>
-          <Grid item>Role : {job.jobType}</Grid>
-          <Grid item>Salary : &#8377; {job.salary} per month</Grid>
           <Grid item>
-            Duration :{" "}
-            {job.duration !== 0 ? `${job.duration} month` : `Flexible`}
+            <div>
+              <div className={classes.iconLabel}>
+                <BusinessCenterIcon className={classes.greyIcon} />
+                {job.jobType}
+              </div>
+            </div>
+            <div>
+              <div className={classes.iconLabel}>
+                <LocalAtm className={classes.greyIcon} />${job.salary} per month
+              </div>
+            </div>
+            <div>
+              <div className={classes.iconLabel}>
+                <Timer className={classes.greyIcon} />
+                {job.duration !== 0 ? `${job.duration} month` : `Flexible`}
+              </div>
+            </div>
+            <div>
+              <div className={classes.iconLabel}>
+                <FiberManualRecord className={classes.greyIcon} /> Apply by{" "}
+                {deadline}
+              </div>
+            </div>
           </Grid>
-          <Grid item>
-            Posted By : {job.recruiter ? job.recruiter.name : "Anonymous"}
-          </Grid>
-          <Grid item>Application Deadline : {deadline}</Grid>
-
-          <Grid item>
-            {job.skillsets.map((skill) => (
-              <Chip label={skill} style={{ marginRight: "2px" }} />
+          <Grid item style={{ marginTop: 10 }}>
+            {job.skillsets.map((skill, index) => (
+              <Chip key={index} label={skill} style={{ marginRight: "2px" }} />
             ))}
           </Grid>
         </Grid>
-        <Grid item xs={3}>
-          <Button
-            variant="contained"
-            color="primary"
-            className={classes.button}
-            onClick={(e) => {
-              e.stopPropagation();
-              if (!loggedin) {
-                history.push("/login");
-              } else {
-                setOpen(true);
-              }
-            }}
-            disabled={userType() === "recruiter"}
-          >
-            Apply
-          </Button>
-        </Grid>
       </Grid>
+      <Button
+        variant="contained"
+        color="primary"
+        className={classes.button}
+        onClick={(e) => {
+          e.stopPropagation();
+          if (!loggedin) {
+            history.push("/login");
+          } else {
+            setOpen(true);
+          }
+        }}
+        disabled={userType() === "recruiter"}
+      >
+        Apply
+      </Button>
       <Modal
         open={open}
         onClose={(e) => handleClose(e)}
@@ -262,44 +310,60 @@ const JobTileAdmin = (props) => {
   return (
     <Paper className={classes.jobTileOuterAdmin} elevation={3}>
       <Grid container>
-        <Grid container item xs={9} spacing={1} direction="column">
+        <Grid container item spacing={1} direction="column">
           <Grid item>
-            <Typography variant="h5">{job.title}</Typography>
+            <Typography variant="h5" style={{ fontWeight: "bold" }}>
+              {job.title}
+            </Typography>
+            <Typography
+              variant="body1"
+              style={{ fontWeight: "bold" }}
+              color="textSecondary"
+            >
+              {job.recruiter ? job.recruiter.name : "Anonymous"}
+            </Typography>
           </Grid>
           <Grid item>
             <Rating value={job.rating !== -1 ? job.rating : null} readOnly />
           </Grid>
-          <Grid item>Role : {job.jobType}</Grid>
-          <Grid item>Salary : &#8377; {job.salary} per month</Grid>
           <Grid item>
-            Duration :{" "}
-            {job.duration !== 0 ? `${job.duration} month` : `Flexible`}
+            <div>
+              <div className={classes.iconLabel}>
+                <BusinessCenterIcon className={classes.greyIcon} />
+                {job.jobType}
+              </div>
+            </div>
+            <div>
+              <div className={classes.iconLabel}>
+                <LocalAtm className={classes.greyIcon} />${job.salary} per month
+              </div>
+            </div>
+            <div>
+              <div className={classes.iconLabel}>
+                <Timer className={classes.greyIcon} />
+                {job.duration !== 0 ? `${job.duration} month` : `Flexible`}
+              </div>
+            </div>
           </Grid>
-          <Grid item>
-            Posted By : {job.recruiter ? job.recruiter.name : "Anonymous"}
-          </Grid>
-
-          <Grid item>
-            {job.skillsets.map((skill) => (
-              <Chip label={skill} style={{ marginRight: "2px" }} />
+          <Grid item style={{ marginTop: 10 }}>
+            {job.skillsets.map((skill, index) => (
+              <Chip key={index} label={skill} style={{ marginRight: "2px" }} />
             ))}
           </Grid>
         </Grid>
-        <Grid item xs={3}>
-          <Button
-            variant="contained"
-            color="primary"
-            className={classes.button}
-            onClick={(e) => {
-              e.stopPropagation();
-              blockJob(job);
-            }}
-            disabled={isBlocked}
-          >
-            Block Job
-          </Button>
-        </Grid>
       </Grid>
+      <Button
+        variant="contained"
+        color="primary"
+        className={classes.button}
+        onClick={(e) => {
+          e.stopPropagation();
+          blockJob(job);
+        }}
+        disabled={isBlocked}
+      >
+        Block Job
+      </Button>
     </Paper>
   );
 };
@@ -641,6 +705,9 @@ const Home = (props) => {
   const [loggedin, setLoggedin] = useState(isAuth());
   const { keyword } = useParams();
   const history = useHistory();
+  const classes = useStyles();
+  const { search } = props;
+  const [loading, setLoading] = useState(false);
   const [searchOptions, setSearchOptions] = useState({
     query: keyword || "",
     jobType: {
@@ -677,6 +744,7 @@ const Home = (props) => {
 
   const getAdminData = () => {
     let address = apiList.jobs;
+    setLoading(true);
     axios
       .get(address, {
         headers: {
@@ -691,6 +759,7 @@ const Home = (props) => {
             return deadline > today;
           })
         );
+        setLoading(false);
       })
       .catch((err) => {
         console.log(err.response.data);
@@ -699,10 +768,12 @@ const Home = (props) => {
           severity: "error",
           message: "Error",
         });
+        setLoading(false);
       });
   };
 
   const getData = () => {
+    setLoading(true);
     let searchParams = [];
     if (searchOptions.query !== "") {
       searchParams = [...searchParams, `q=${searchOptions.query}`];
@@ -766,6 +837,7 @@ const Home = (props) => {
             return deadline > today;
           })
         );
+        setLoading(false);
       })
       .catch((err) => {
         console.log(err.response.data);
@@ -774,6 +846,7 @@ const Home = (props) => {
           severity: "error",
           message: "Error",
         });
+        setLoading(false);
       });
   };
 
@@ -793,24 +866,33 @@ const Home = (props) => {
           justify="center"
           alignItems="center"
         >
-          <Typography variant="h2">Admin</Typography>
+          <Typography variant="h5" align="left" style={{ fontWeight: "bold" }}>
+            Admin
+          </Typography>
         </Grid>
-        <Grid
-          container
-          item
-          xs
-          direction="column"
-          alignItems="stretch"
-          justify="center"
-        >
+        <Grid container spacing={3}>
           {jobs.length > 0 ? (
             jobs.map((job) => {
-              return <JobTileAdmin key={job._id} job={job} />;
+              return (
+                <Grid item xs={12} sm={6} md={4}>
+                  <JobTileAdmin key={job._id} job={job} />
+                </Grid>
+              );
             })
+          ) : loading ? (
+            <div style={{ textAlign: "center", width: "100%" }}>
+              <CircularProgress style={{ marginTop: 200 }} />
+            </div>
           ) : (
-            <Typography variant="h5" style={{ textAlign: "center" }}>
-              No jobs found
-            </Typography>
+            <Grid item xs={12}>
+              <Typography
+                variant="h5"
+                color="textSecondary"
+                style={{ textAlign: "center", marginTop: 200 }}
+              >
+                No jobs found
+              </Typography>
+            </Grid>
           )}
         </Grid>
       </Grid>
@@ -831,67 +913,103 @@ const Home = (props) => {
           justify="center"
           alignItems="center"
         >
-          <Grid item xs>
+          <Grid item xs style={{ width: "100%" }}>
             {window.location.pathname?.includes("search") ? (
-              <Typography variant="h2">Search</Typography>
-            ) : loggedin && window.location.pathname === "/" ? (
-              <Typography variant="h2">Based on recent search</Typography>
+              <Typography
+                variant="h5"
+                align="left"
+                style={{ fontWeight: "bold" }}
+              >
+                Search
+              </Typography>
             ) : (
-              <Typography variant="h2">All Jobs</Typography>
+              <Typography
+                variant="h5"
+                align="left"
+                style={{ fontWeight: "bold" }}
+              >
+                Welcome {userName()}
+              </Typography>
             )}
           </Grid>
-          <Grid item xs>
-            <TextField
-              label="Search Jobs"
-              value={searchOptions.query}
-              onChange={(event) =>
-                setSearchOptions({
-                  ...searchOptions,
-                  query: event.target.value,
-                })
-              }
-              onKeyPress={(ev) => {
-                if (ev.key === "Enter") {
-                  history.push(`/search/${searchOptions.query}`);
-                  getData();
+          <Grid item xs style={{ width: "100%" }}>
+            <div className={classes.searchDiv}>
+              <TextField
+                label="Search Jobs"
+                value={searchOptions.query}
+                onChange={(event) =>
+                  setSearchOptions({
+                    ...searchOptions,
+                    query: event.target.value,
+                  })
                 }
-              }}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment>
-                    <IconButton onClick={() => getData()}>
-                      <SearchIcon />
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-              style={{ width: "500px" }}
-              variant="outlined"
-            />
+                onKeyPress={(ev) => {
+                  if (ev.key === "Enter") {
+                    history.push(`/search/${searchOptions.query}`);
+                    getData();
+                  }
+                }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment>
+                      <IconButton onClick={() => getData()}>
+                        <SearchIcon />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+                style={{ width: "100%" }}
+                variant="outlined"
+              />
+              <IconButton onClick={() => setFilterOpen(true)}>
+                <FilterListIcon />
+              </IconButton>
+            </div>
           </Grid>
-          <Grid item>
-            <IconButton onClick={() => setFilterOpen(true)}>
-              <FilterListIcon />
-            </IconButton>
+          <Grid item xs style={{ width: "100%" }}>
+            {loggedin && window.location.pathname === "/" ? (
+              <Typography
+                className={classes.homeTitle}
+                variant="h5"
+                align="left"
+              >
+                Based on your recent search...
+              </Typography>
+            ) : loggedin && window.location.pathname === "/" ? null : (
+              <Typography
+                className={classes.homeTitle}
+                variant="h5"
+                align="left"
+              >
+                Search results...
+              </Typography>
+            )}
           </Grid>
         </Grid>
 
-        <Grid
-          container
-          item
-          xs
-          direction="column"
-          alignItems="stretch"
-          justify="center"
-        >
+        <Grid container spacing={3}>
           {jobs.length > 0 ? (
             jobs.map((job) => {
-              return <JobTile key={job._id} job={job} />;
+              return (
+                <Grid item xs={12} sm={6} md={4}>
+                  <JobTile key={job._id} job={job} />
+                </Grid>
+              );
             })
+          ) : loading ? (
+            <div style={{ textAlign: "center", width: "100%" }}>
+              <CircularProgress style={{ marginTop: 200 }} />
+            </div>
           ) : (
-            <Typography variant="h5" style={{ textAlign: "center" }}>
-              No jobs found
-            </Typography>
+            <Grid item xs={12}>
+              <Typography
+                variant="h5"
+                color="textSecondary"
+                style={{ textAlign: "center", marginTop: 200 }}
+              >
+                No jobs found
+              </Typography>
+            </Grid>
           )}
         </Grid>
         {/* <Grid item>
