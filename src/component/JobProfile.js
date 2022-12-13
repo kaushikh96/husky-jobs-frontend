@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams, useHistory } from "react-router-dom";
 import apiList from "../lib/apiList";
 import { SetPopupContext } from "../App";
+import Rating from "@material-ui/lab/Rating";
 import moment from "moment";
 import {
   Button,
@@ -12,10 +13,16 @@ import {
   Modal,
   makeStyles,
   Paper,
-  TextField,
+  TextField
 } from "@material-ui/core";
+import WorkIcon from "@material-ui/icons/Work";
+import LocationOnIcon from '@material-ui/icons/LocationOn';
+import ShareIcon from '@material-ui/icons/Share';
+
+import AccessTimeIcon from '@material-ui/icons/AccessTime';
 import isAuth from "../lib/isAuth";
 import { userType } from "../lib/isAuth";
+import { NavigateBeforeSharp } from "@material-ui/icons";
 
 const useStyles = makeStyles((theme) => ({
   popupDialog: {
@@ -112,91 +119,90 @@ const JobProfile = () => {
   return (
     <div>
       <h1>Job Description</h1>
-      <Card>
+      <Card style={{ padding: '30px' }}>
         <Grid container spacing={2}>
-          <Grid item xs={4}>
-            <b> Name:</b>
+          <Grid item xs={12} >
+          <b>  <span style={{ fontSize: '22px'}}>{jobDetails.title}</span>  </b> &nbsp;
+             Job Id: 12345 {jobDetails.externalJobId} &nbsp;
           </Grid>
-          <Grid item xs={8}>
-            {jobDetails.title}
-          </Grid>
-          <Grid item xs={4}>
-            <b> Accepted Appplications:</b>
-          </Grid>
-          <Grid item xs={8}>
-            {jobDetails.activeApplications}
-          </Grid>
-          <Grid item xs={4}>
-            <b>Accepted Candidates: </b>
-          </Grid>
-          <Grid item xs={8}>
-            {jobDetails.acceptedCandidates}
-          </Grid>
-          <Grid item xs={4}>
-            <b>Blocked:</b>
-          </Grid>
-          <Grid item xs={8}>
-            {jobDetails.blocked == false ? "Yes" : "No"}
-          </Grid>
-          <Grid item xs={4}>
-            <b>Date of Posting:</b>
-          </Grid>
-          <Grid item xs={8}>
-            {dateofOperation}
-          </Grid>
-          <Grid item xs={4}>
-            <b>Deadline:</b>
-          </Grid>
-          <Grid item xs={8}>
-            {deadLine}
-          </Grid>
-          <Grid item xs={4}>
-            <b>Duration:</b>
-          </Grid>
-          <Grid item xs={8}>
-            {jobDetails.duration}
-          </Grid>
-          <Grid item xs={4}>
-            <b>External Job Id:</b>
-          </Grid>
-          <Grid item xs={8}>
-            {jobDetails.externalJobId}
-          </Grid>
-          <Grid item xs={4}>
-            <b>Job Type:</b>
-          </Grid>
-          <Grid item xs={8}>
+        </Grid>
+        <Grid container spacing={2}>
+          <Grid item xs={1} style={{ backgroundColor: '#ECECEC',alignItems:'center' }}>
+            <WorkIcon></WorkIcon>
             {jobDetails.jobType}
+          </Grid>&nbsp;&nbsp;
+          <Grid item xs={2} style={{ backgroundColor: '#ECECEC',verticalAlign:'middle' }}>
+            <LocationOnIcon></LocationOnIcon>
+            Herndon, VA, United States
+          </Grid>&nbsp;&nbsp;
+          <Grid item xs={1} style={{ backgroundColor: '#ECECEC',verticalAlign:'middle' }}>
+            <AccessTimeIcon></AccessTimeIcon>
+            {jobDetails.duration} months
+          </Grid>&nbsp;&nbsp;
+          <Grid item xs={1} style={jobDetails.blocked == false ? {backgroundColor: '#c5e1a5'} : {backgroundColor: '#ff8164'} }>
+              {jobDetails.blocked == false ? "Open" : "Blocked"}
+          </Grid>&nbsp;
+          <Grid item xs={2}>
+          <ShareIcon></ShareIcon>
+             Share this job
+          </Grid>  
+        </Grid>
+        <Grid container spacing={2}>
+          <Grid item xs={2}>
+            <b>Posted On:</b>&nbsp;{dateofOperation}
           </Grid>
-          <Grid item xs={4}>
-            <b>Maximum Applications:</b>
-          </Grid>
-          <Grid item xs={8}>
-            {jobDetails.maxApplicants}
-          </Grid>
-          <Grid item xs={4}>
-            <b>Maximum Positions: </b>
-          </Grid>
-          <Grid item xs={8}>
-            {jobDetails.maxPositions}
-          </Grid>
-          <Grid item xs={4}>
-            <b>Skills:</b>
-          </Grid>
-          <Grid item xs={8}>
-            {jobDetails.maxApplicants}
-          </Grid>
-          <Grid item xs={4}>
-            <b>Rating:</b>
-          </Grid>
-          <Grid item xs={8}>
-            {jobDetails.rating == -1 ? 0 : jobDetails.rating}
-          </Grid>
-          <Grid item xs={4}>
-            <b>Salary: </b>
+          <Grid item xs={2}>
+            <b>Apply By:</b>&nbsp;{deadLine}
           </Grid>
           <Grid item xs={8}>
-            ${jobDetails.salary} per annum
+            
+          </Grid>
+         
+          
+          <Grid item xs={2}>
+            <b>{jobDetails.maxApplicants}</b> Applications Accepted
+          </Grid>
+          <Grid item xs={2}>
+            <b>{jobDetails.maxPositions}</b> Vacant Positions  
+          </Grid>
+          <Grid item xs={8}>
+           
+          </Grid>
+          <Grid item xs={2}>
+            <b>{jobDetails.activeApplications}</b> Candidates Applied
+          </Grid>
+          <Grid item xs={2}>
+            <b>{jobDetails.acceptedCandidates}</b> Candidates Selected  
+          </Grid>
+          <Grid item xs={8}>
+           
+          </Grid>
+          <Grid item xs={2}>
+            <b>Salary:</b>&nbsp;${jobDetails.salary} per annum
+          </Grid>
+          <Grid item xs={10}>
+          <Rating value={jobDetails.rating !== -1 ? jobDetails.rating : null} readOnly />
+          </Grid>
+          </Grid>
+          <Grid container spacing={2}>
+
+            {jobDetails?.skillsets?.map((y) => {
+              return (
+                    <Grid item xs={1} style={{backgroundColor: '#ECECEC',borderRadius:'20px'}}>
+                      {y}
+                    </Grid>
+              );
+            })}
+          </Grid>
+          <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <b>Job Description:</b>
+          </Grid>
+          <Grid item xs={6}>
+            <i>{jobDetails.description}</i>
+          </Grid>
+          <Grid item xs={6}>
+            
           </Grid>
           <br />
           <Grid item xs={1}>

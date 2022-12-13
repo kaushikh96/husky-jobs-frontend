@@ -5,13 +5,20 @@ import { useHistory, useParams } from "react-router-dom";
 import apiList, { server } from "../lib/apiList";
 import { SetPopupContext } from "../App";
 import { Button, Card, Grid } from "@material-ui/core";
-
+import Rating from "@material-ui/lab/Rating";
+import {makeStyles, Avatar} from "@material-ui/core";
 const PublicProfile = () => {
   const { profileId } = useParams();
   const [profileDetails, setProfileDetails] = useState("");
   const [eduDetails, setEduDetails] = useState([]);
   const setPopup = useContext(SetPopupContext);
   const history = useHistory();
+  const useStyles = makeStyles((theme) => ({
+    avatar: {
+      width: theme.spacing(17),
+      height: theme.spacing(17),
+    }
+  }));
 
   useEffect(() => {
     getData();
@@ -68,20 +75,39 @@ const PublicProfile = () => {
       });
     }
   };
-
+  const classes = useStyles();
   return (
     <div>
       <h1>Candidate Profile</h1>
-      <Card>
+      <Card style={{padding:'30px'}}>
         <Grid container spacing={2}>
-          <Grid item xs={4}>
-            <b> Name:</b>
+          <Grid xs = {12}>
+          <Avatar
+            src={`${server}${profileDetails.profile}`}
+            className={classes.avatar}
+          />
+          </Grid>
+        
+          <Grid item xs={4} style={{fontSize:'22px'}}>
+            <b>{profileDetails.name}</b> &nbsp;
+            
           </Grid>
           <Grid item xs={8}>
-            {profileDetails.name}
+            
+          </Grid>
+          <Grid item xs={4} style={{fontSize:'22px'}}>
+          <Rating value={profileDetails.rating !== -1 ? profileDetails.rating : 0} readOnly />
+            
+          </Grid>
+          <Grid item xs={8}>
+            
+          </Grid>
+          
+          <Grid item xs={4}>
+            <b> Education</b>
           </Grid>
           <Grid item xs={4}>
-            <b> Education:</b>
+            
           </Grid>
           <Grid item xs={8}>
             {eduDetails.map((y) => {
@@ -97,7 +123,7 @@ const PublicProfile = () => {
                     <Grid item xs={2}>
                       <i> Start Year:</i>
                     </Grid>
-                    <Grid item xs={1}>
+                    <Grid item xs={2}>
                       {y.startYear}
                     </Grid>
                     <Grid item xs={2}>
@@ -111,30 +137,14 @@ const PublicProfile = () => {
               );
             })}
           </Grid>
-
-          <Grid item xs={4}>
-            <b> Candidate Rating:</b>
-          </Grid>
-          <Grid item xs={8}>
-            {profileDetails.rating == -1 ? 0 : profileDetails.rating}
-          </Grid>
-          <Grid item xs={4}>
-            <b> Profile:</b>
-          </Grid>
-          <Grid item xs={8}>
-            {profileDetails.profile}
-          </Grid>
-          <Grid item xs={4}>
-            <b> Resume:</b>
-          </Grid>
-          <Grid item xs={8}>
-            {profileDetails.resume}
-          </Grid>
-          <Grid item xs={4}>
-            <b> Skills:</b>
-          </Grid>
-          <Grid item xs={8}>
-            {profileDetails.resume}
+          <Grid item xs={1}>
+              {profileDetails?.skillsets?.map((y) => {
+              return (
+                    <Grid item xs={1} style={{backgroundColor: '#ECECEC',borderRadius:'20px'}}>
+                      {y}
+                    </Grid>
+              );
+            })}
           </Grid>
         </Grid>
         <br />
@@ -146,7 +156,7 @@ const PublicProfile = () => {
           }}
         >
           Back
-        </Button>
+        </Button>&nbsp;&nbsp;&nbsp;
         <Button
           variant="contained"
           color="primary"
